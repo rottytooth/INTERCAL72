@@ -3,4 +3,4 @@
 by Don Woods and James M. Lyon
 
 * Original scans
-* SNOBOL file (as transcribed by [@WizardOfHaas] and [@rottytooth])
+* SPITBOL file (as transcribed by [@WizardOfHaas](https://www.github.com/WizardOfHaas) and [@rottytooth](https://www.github.com/rottytooth))

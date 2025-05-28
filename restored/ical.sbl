@@ -1,14 +1,16 @@
 	&FULLSCAN = 1
 	&STLIMIT = 16777215
 	&ERRLIMIT = 1 SETEXIT(.ERR)
-*   &FTRACE = 1000
+*    &FTRACE = 1000
     &TRACE = 1000
+
 *   RX = LOAD('KLOCK()INTEGER') REMDR(KLOCK() + SUBSTR(DATE(),4,2),524288) * 2 + 1
 *   I think this is a random number seed. I'll replace it with something better later
-    RX = 1
+    RX = TIME()
     DEFINE("KLOCK()X")
 
-	&TRIM = 1 DEFINE('SKIP(X)FIND',.FIND)
+	&TRIM = 1
+    DEFINE('SKIP(X)FIND',.FIND)
 	RESULT = ' :(START);' OUTPUT(.FILE,1,'SCRATCH') INPUT(.OPT,2,'SCRATCH')
 	OPT = OPT
     (OUTPUT(.EJ,3,'1') OUTPUT(.PLUS,4,"+") DEFINE('DF(X)') DETACH(.OPT))
@@ -30,11 +32,11 @@
 	DF('VS(X);VSM();IEXP();BITS(N);SUB(X)PTRX,VAL,TYP;CLR();TB(X)L;PFX(X)')
 	DF('P2(X,WID);RND(N);FLO(X);QT(X);RD2();PDS(M);PLUR(N);NO(X)')
 	DG = SPAN('0123456789')
-*   I need to figure out if this HAS to be the /360's char set
-	HEX0 = SUBSTR(&ALPHABET,1,1)
-	HEX012 = SUBSTR(&ALPHABET,1,3)
+
 *    HEX0 = x'00'
 *    HEX012 = x'000102'
+	HEX0 = SUBSTR(&ALPHABET,1,1)
+	HEX012 = SUBSTR(&ALPHABET,1,3)
 	TB('BT=2(¢=I/~=S);UT=3(&=A/V=O/v=X);TY=4(.=A/:=B/,=C/;=D);GER=12')
 	TB('LNG=4(.=SHORT/:=LONG/,=SHORT/;=LONG);LABEL=50(X=X)')
 	A = 'CALCULATING1NEXTING2FORGETTING3RESUMING4STASHING5RETRIEVING6IGNOTING7REMEMBERING8ABSTAINING9REINSTATING10WRITING12READINGOUT13'
@@ -42,7 +44,6 @@
 *    TRACE('COMP', 'F')
 *    TRACE('VS', 'F')
 *    TRACE('VAR', 'F')
-
 *    TRACE(.WKINP, 'A')
 
 GERL A (BREAK('123456789') . V) (DG . U) = :F(GERK)
@@ -231,17 +232,15 @@ IGARR DIFFER(X) :F(RETURN)
     ARR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
 
 BITS NMBR = N
-    GEBIG(N,'4294967296') :S(RETURN)
+    GEBIG(N,'4294967296') :S(FRETURN)
     TOP = '0'
     GEBIG(N,'2147483643') :F(TOP0)
     TOP = '1'
-    NMBR = CV(CONVERT(N '.DO','DREAL') - TWO31)
-
+    NMBR = CV(CONVERT(N '.D0','DREAL') - TWO31)
 TOP0 NMBR = CV(NMBR)
-
 BTLP BITS = REMDR(NMBR,2) BITS
     NMBR = NMBR / 2
-    BITS = GF(SIZE(BITS),31) TOP BITS :F(BTLP)S(RETURN)
+    BITS = GE(SIZE(BITS),31) TOP BITS :F(BTLP)S(RETURN)
 
 *   Goes back to start of line to re-scan
 CLR PTR = 0 :(RETURN)
@@ -254,20 +253,22 @@ ELEM ELEM = ID() :S(RETURN)
 EXLIST EXLIST = EXPR() :F(FRETURN)
 EXLOOP EXLIST = EXLIST ',' SKIP(X) EXPR() :F(RETURN)S(EXLOOP)
 
-IEXP EXP = EXPR() FIND(RPOS(0)) :S(RETURN)
+*   Do I need to change EXP = EXP... to IEXP = IEXP...?
+IEXP IEXP = EXPR() FIND(RPOS(0)) :S(RETURN)
     ERROR('017','DO YOU EXPECT ME TO FIGURE THIS OUT?') :(FRETURN)
 
 EXPR EXPR = ELEM() :F(FRETURN)
     PTRX = PTR
-    EXPR = 'F' BT<FIND(ANY('c~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
-    PTR = PTRX :(RETRUN)
+*   Bad GO TO error... here! Something propigated down from MESH handling
+    EXPR = 'F' BT<FIND(ANY('¢~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
+    PTR = PTRX :(FRETRUN)
 
 *   This is SKIP(X) -> FIND
 *       WKINP is global, current line of INTERCAL being considered
 *       
-FIND WKINP POS(PTR) X . FIND @PTR :F(FRETURN)S(RETURN)
+FIND WKINP POS(PTR) X . FIND @PTR :S(RETURN)F(FRETURN)
 
-GEBIG LGE(LPAD(i,SIZE(J),'0'),LPAD(J,SIZE(I),'0')) :S(RETURN)F(FRETURN)
+GEBIG LGE(LPAD(I,SIZE(J),'0'),LPAD(J,SIZE(I),'0')) :S(RETURN)F(FRETURN)
 
 ID PTRX = PTR
     ID = SKIP(ANY('"' '"') . QUOT) EXPR() SKIP(QUOT) :S(RETURN)
@@ -294,7 +295,6 @@ IGSUB DIFFER(X) :F(RETURN)
 VA VA = VAR(X) :S(RETURN)
     VA = ARR(X) :S(RETURN)F(FRETURN)
 
-*I AM MISSING A CLR() SOMEWHERE... SINCE PTR=0 makes this work..
 VAR PTRX = PTR
     VAR = "$(ST<'" FIND(ANY(".:") . TYP) NUM(1,.VAL) "'> '" TYP VAL "')" :S(IGVAR)
     PTR = PTRX :(FRETURN)
@@ -321,23 +321,20 @@ ERR (NE(&ERRTYPE,6001) ERROR('788', 'UNEXPLAINED COMPILER BUG {' &ERRTYPE - 632 
 ERROR OUTPUT = RPAD('IDL' NUM 'I    ' MSG ' <',114,'-') ' ERROR'
     FTL = FTL + 1
     &CODE = 1 IDENT(NXT) :S(RETURN)
-*    &CODE = 13 LOAD('WTP(STRING)STRING') WTP(OUTPUT)
+    &CODE = 13 WTP(OUTPUT)
     OUTPUT = DUPL(' ',10) 'ON THE WAY TO THE STATEMENT ' NXT
     OUTPUT = DUPL(' ',10) 'CORRECT SOURCE AND RESUBNIT' :(END)
 
 *   This is assuming 80 columns, like a punch card
 *       Trace shows it's called with more than just A
 *       I may need to make some adjustments
-FLO 
-*    X = RPAD(X,81)
-    X LEN(80) . AT LEN(1) :F(FNL)
-    OUTPUT = AT
+FLO X LEN(80) . AT LEN(1) :F(FNL)
     (' ' AT) QT(1) ESE
     QTS = QN
     QTE = QT(1)
     REVERSE(AT) (NOTANY("'") . QTE *NE(REMDR(QTS - QN,2)) @BRK) | (@BRK ('(' | ',')) | (')' @BRK) | ESE :F(ARGH)
     QTE LEN(1) = "'"
-    X LEN(80 - BRK) = "+" QTE
+    X LEN(80 - BRK) = '+' QTE
     AT RPOS(BRK) LEN(BRK) = QTE
     FILE = RPAD(AT,80) :(FLO)
 FNL FILE = RPAD(X,80) :(RETURN)

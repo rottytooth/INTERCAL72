@@ -1,7 +1,7 @@
 	&FULLSCAN = 1
 	&STLIMIT = 16777215
-	&ERRLIMIT = 1 SETEXIT(.ERR)
-*    &FTRACE = 1000
+*	&ERRLIMIT = 1 SETEXIT(.ERR)
+    &FTRACE = 1000
     &TRACE = 1000
 
 *   RX = LOAD('KLOCK()INTEGER') REMDR(KLOCK() + SUBSTR(DATE(),4,2),524288) * 2 + 1
@@ -41,9 +41,11 @@
 	TB('LNG=4(.=SHORT/:=LONG/,=SHORT/;=LONG);LABEL=50(X=X)')
 	A = 'CALCULATING1NEXTING2FORGETTING3RESUMING4STASHING5RETRIEVING6IGNOTING7REMEMBERING8ABSTAINING9REINSTATING10WRITING12READINGOUT13'
 
-*    TRACE('COMP', 'F')
-*    TRACE('VS', 'F')
 *    TRACE('VAR', 'F')
+*    TRACE('VS', 'F')
+    TRACE(.X, 'A')
+    TRACE(.BT, 'A')
+*    TRACE('FIND', 'F')
 *    TRACE(.WKINP, 'A')
 
 GERL A (BREAK('123456789') . V) (DG . U) = :F(GERK)
@@ -170,7 +172,7 @@ WOW WKINP "!" = "'." :S(WOW)
 
 *   Replace first 3 hex values.
 ULP WKINP (LEN(1) ANY(HEX012)) . U = REPLACE(REVERSE(U),HEX012,'&Vv') :S(ULP)
-    ADD(CLR() ' ' VS('X') SKIP('<-') EXP() ') :F(DIM)' PUSH(1)) :S(ECOMP)
+    ADD(CLR() ' ' VS('X') SKIP('<-') IEXP() ') :F(DIM)' PUSH(1)) :S(ECOMP)
     ADD(CLR() ' ' ARR('X') SKIP('<-') " = ARRAY('" EXLIST('BY') FIND(RPOS(0)) "') :F(DIM)" PUSH(1)) :S(ECOMP)
     (ADD(CLR() SKIP('FORGET#') ' NXTS = NXTS - ' NUM(1) FIND(RPOS(0)) PUSH(3)) ADD(' NXTS = LT(NXTS) 0')) :S(ECOMP)
     (ADD(CLR() SKIP('FORGET') ' NXTS = NXTS - DCML(' IEXP() ') :F(DIM)' PUSH(3)) ADD(' NXTS = LT(NXTS) 0')) :S(ECOMP)
@@ -227,7 +229,6 @@ ECOMP ELBL = 'E' NNN :(RETURN)
 ARR PTRX = PTR
     ARR = "$(ST<'" FIND(ANY(",;") . TYP) NUM(1,.VAL) "'> '" TYP VAL "')" :S(IGARR)
     PTR = PTRX :(FRETURN)
-
 IGARR DIFFER(X) :F(RETURN)
     ARR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
 
@@ -261,7 +262,7 @@ EXPR EXPR = ELEM() :F(FRETURN)
     PTRX = PTR
 *   Bad GO TO error... here! Something propigated down from MESH handling
     EXPR = 'F' BT<FIND(ANY('¢~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
-    PTR = PTRX :(FRETRUN)
+    PTR = PTRX :(RETRUN)
 
 *   This is SKIP(X) -> FIND
 *       WKINP is global, current line of INTERCAL being considered
@@ -298,11 +299,12 @@ VA VA = VAR(X) :S(RETURN)
 VAR PTRX = PTR
     VAR = "$(ST<'" FIND(ANY(".:") . TYP) NUM(1,.VAL) "'> '" TYP VAL "')" :S(IGVAR)
     PTR = PTRX :(FRETURN)
-
 IGVAR DIFFER(X) :F(RETURN)
     VAR = VAR ' = ' LNG<TYP> '('
     VAR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
 
+* What happens when this is called and X = ''?
+*   What even sets X here? I can trace that!
 VS VS = VAR(X) :S(RETURN)
     VS = SUB(X) :S(RETURN)F(FRETURN)
 

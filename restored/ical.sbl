@@ -262,7 +262,7 @@ EXPR EXPR = ELEM() :F(FRETURN)
     PTRX = PTR
 *   Bad GO TO error... here! Something propigated down from MESH handling
     EXPR = 'F' BT<FIND(ANY('¢~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
-    PTR = PTRX :(RETRUN)
+    PTR = PTRX :(RETURN)
 
 *   This is SKIP(X) -> FIND
 *       WKINP is global, current line of INTERCAL being considered
@@ -404,6 +404,7 @@ LAST COD = POL(L) O() O(PL ' / ' DO) O() 'NO'
     FILE = DIFFER(LIB) ENDFILE('SUB') OUTPUT(.FILE,'PFX') './ ADD NAME=NOOPTPFX'
     (LT(PL * 5,DO) ERROR('079','USER IS NOT SUFFICIENTLY POLITE','1'))
     (GT(PL * 3,DO) ERROR('099','USER IS OVERLY POLITE','1'))
+*   WHAT EXACTLY IS THIS DOING???
     RESULT GT(RND(10),9) BUG ":" = "$('A' RND(" DO ")) = 'X' :"
     LABEL = CONVERT(LABEL,'ARRAY')
     A = 2

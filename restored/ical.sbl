@@ -37,14 +37,15 @@
 *    HEX012 = x'000102'
 	HEX0 = SUBSTR(&ALPHABET,1,1)
 	HEX012 = SUBSTR(&ALPHABET,1,3)
-	TB('BT=2(¢=I/~=S);UT=3(&=A/V=O/v=X);TY=4(.=A/:=B/,=C/;=D);GER=12')
+*   I had to convert change -> big money to make SPITBOLx64 happy
+	TB('BT=2($=I/~=S);UT=3(&=A/V=O/v=X);TY=4(.=A/:=B/,=C/;=D);GER=12')
 	TB('LNG=4(.=SHORT/:=LONG/,=SHORT/;=LONG);LABEL=50(X=X)')
 	A = 'CALCULATING1NEXTING2FORGETTING3RESUMING4STASHING5RETRIEVING6IGNOTING7REMEMBERING8ABSTAINING9REINSTATING10WRITING12READINGOUT13'
 
 *    TRACE('VAR', 'F')
 *    TRACE('VS', 'F')
-    TRACE(.X, 'A')
-    TRACE(.BT, 'A')
+*    TRACE(.X, 'A')
+*    TRACE(.BT, 'A')
 *    TRACE('FIND', 'F')
 *    TRACE(.WKINP, 'A')
 
@@ -261,7 +262,7 @@ IEXP IEXP = EXPR() FIND(RPOS(0)) :S(RETURN)
 EXPR EXPR = ELEM() :F(FRETURN)
     PTRX = PTR
 *   Bad GO TO error... here! Something propigated down from MESH handling
-    EXPR = 'F' BT<FIND(ANY('¢~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
+    EXPR = 'F' BT<FIND(ANY('$~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
     PTR = PTRX :(RETURN)
 
 *   This is SKIP(X) -> FIND

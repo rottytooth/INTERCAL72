@@ -1,7 +1,7 @@
 	&FULLSCAN = 1
 	&STLIMIT = 16777215
 *	&ERRLIMIT = 1 SETEXIT(.ERR)
-    &FTRACE = 1000
+*    &FTRACE = 1000
     &TRACE = 1000
 
 *   RX = LOAD('KLOCK()INTEGER') REMDR(KLOCK() + SUBSTR(DATE(),4,2),524288) * 2 + 1
@@ -11,6 +11,8 @@
 
 	&TRIM = 1
     DEFINE('SKIP(X)FIND',.FIND)
+*   IDK if result is supposed to be a file handle or not...
+*    OUTPUT(.RESULT,10,'RESULT')
 	RESULT = ' :(START);' OUTPUT(.FILE,1,'SCRATCH') INPUT(.OPT,2,'SCRATCH')
 	OPT = OPT
     (OUTPUT(.EJ,3,'1') OUTPUT(.PLUS,4,"+") DEFINE('DF(X)') DETACH(.OPT))
@@ -22,6 +24,9 @@
 *       In the port to SPITBOLx64 I needed to reimplement this using an output file
     OUTPUT(.WTPO,6,'WTP')
     DEFINE('WTP(STRING)STRING')
+
+*   Added a few missing file handles
+    OUTPUT(.SUB,7,'OPTSUB')
 
 *   This is doing initial declaration for all functions declared later
 *   ...but some of these are system functions that I will need to prune
@@ -42,7 +47,7 @@
 	TB('LNG=4(.=SHORT/:=LONG/,=SHORT/;=LONG);LABEL=50(X=X)')
 	A = 'CALCULATING1NEXTING2FORGETTING3RESUMING4STASHING5RETRIEVING6IGNOTING7REMEMBERING8ABSTAINING9REINSTATING10WRITING12READINGOUT13'
 
-*    TRACE('VAR', 'F')
+*    TRACE('ADD', 'F')
 *    TRACE('VS', 'F')
 *    TRACE(.X, 'A')
 *    TRACE(.BT, 'A')
@@ -202,7 +207,7 @@ NOT7 (CLR() SKIP('REMEMBER')) :F(NOT8)
 RMBR VA('X') (' IG' BREAK(")")) . U :F(NG)
     (ADD(U " =") FIND('+')) :S(RMBR)
     (FIND(RPOS(0)) PUSH(8)) :S(ECOMP)F(NG)
-NOT8 (ADD(CLR() SKIP("ABSTRAINFROM(") "DIFFER(LB<'" NUM(1,.VAL) "'>) :F(ABN)") ADD(" $('A' LB<'" VAL "'>) =1" PUSH(9))) :S(ECOMP)
+NOT8 (ADD(CLR() SKIP("ABSTRAINFROM(") "DIFFER(LB<'" NUM(1,.VAL) "'>) :F(ABN)") ADD(" $('A' LB<'" VAL "'>) = 1" PUSH(9))) :S(ECOMP)
     (ADD(CLR() SKIP("REINSTATE(") " DIFFER(<LB<'" NUM(1,.VAL) "'>) :F(ABN)") ADD(" $('A' LB<'" VAL "'>) =" PUSH(10))) :S(ECOMP)
     (CLR() FIND('ABSTAINFROM' | 'REINSTATE')) ('' $ LBL) LEN(9) (LEN(1) $ LBL | '') :F(NOT10)
     LBL 'O' = ',1'
@@ -255,13 +260,11 @@ ELEM ELEM = ID() :S(RETURN)
 EXLIST EXLIST = EXPR() :F(FRETURN)
 EXLOOP EXLIST = EXLIST ',' SKIP(X) EXPR() :F(RETURN)S(EXLOOP)
 
-*   Do I need to change EXP = EXP... to IEXP = IEXP...?
 IEXP IEXP = EXPR() FIND(RPOS(0)) :S(RETURN)
     ERROR('017','DO YOU EXPECT ME TO FIGURE THIS OUT?') :(FRETURN)
 
 EXPR EXPR = ELEM() :F(FRETURN)
     PTRX = PTR
-*   Bad GO TO error... here! Something propigated down from MESH handling
     EXPR = 'F' BT<FIND(ANY('$~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
     PTR = PTRX :(RETURN)
 
@@ -304,8 +307,6 @@ IGVAR DIFFER(X) :F(RETURN)
     VAR = VAR ' = ' LNG<TYP> '('
     VAR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
 
-* What happens when this is called and X = ''?
-*   What even sets X here? I can trace that!
 VS VS = VAR(X) :S(RETURN)
     VS = SUB(X) :S(RETURN)F(FRETURN)
 
@@ -329,8 +330,6 @@ ERROR OUTPUT = RPAD('IDL' NUM 'I    ' MSG ' <',114,'-') ' ERROR'
     OUTPUT = DUPL(' ',10) 'CORRECT SOURCE AND RESUBNIT' :(END)
 
 *   This is assuming 80 columns, like a punch card
-*       Trace shows it's called with more than just A
-*       I may need to make some adjustments
 FLO X LEN(80) . AT LEN(1) :F(FNL)
     (' ' AT) QT(1) ESE
     QTS = QN

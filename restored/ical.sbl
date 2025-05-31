@@ -1,0 +1,450 @@
+	&FULLSCAN = 1
+	&STLIMIT = 16777215
+*	&ERRLIMIT = 1 SETEXIT(.ERR)
+*    &FTRACE = 1000
+    &TRACE = 1000
+
+*   RX = LOAD('KLOCK()INTEGER') REMDR(KLOCK() + SUBSTR(DATE(),4,2),524288) * 2 + 1
+*   I think this is a random number seed. I'll replace it with something better later
+    RX = TIME()
+    DEFINE("KLOCK()X")
+
+	&TRIM = 1
+    DEFINE('SKIP(X)FIND',.FIND)
+*   IDK if result is supposed to be a file handle or not...
+*    OUTPUT(.RESULT,10,'RESULT')
+	RESULT = ' :(START);' OUTPUT(.FILE,1,'SCRATCH') INPUT(.OPT,2,'SCRATCH')
+	OPT = OPT
+    (OUTPUT(.EJ,3,'1') OUTPUT(.PLUS,4,"+") DEFINE('DF(X)') DETACH(.OPT))
+
+*   This uses a punch out, so set that to an output file
+    OUTPUT(.PUNCH,5,'PUNCH')
+
+*   WTP(wrtie-to-programmer) was initially loaded as an external module.
+*       In the port to SPITBOLx64 I needed to reimplement this using an output file
+    OUTPUT(.WTPO,6,'WTP')
+    DEFINE('WTP(STRING)STRING')
+
+*   Added a few missing file handles
+    OUTPUT(.SUB,7,'OPTSUB')
+
+*   This is doing initial declaration for all functions declared later
+*   ...but some of these are system functions that I will need to prune
+*       EXP -> IEXP
+	DF('COMP(S);PR(X);CV(X);O(X)Y;PACK(PACK);POL(Z);EXPR()PTRX;ELEM()PTRX')
+	DF('FIND(X);EXLIST(X);PUSH(N);ID()PTRX,QUOT;ADD(X);ERROR(NUM,MSG,NXT)')
+	DF('NUM(N,OPT)PTRX;MESH()PTRX;VAR(X)PTRX;GEBIG(I,J);ARR(X)PTRX;VA(X)')
+	DF('VS(X);VSM();IEXP();BITS(N);SUB(X)PTRX,VAL,TYP;CLR();TB(X)L;PFX(X)')
+	DF('P2(X,WID);RND(N);FLO(X);QT(X);RD2();PDS(M);PLUR(N);NO(X)')
+	DG = SPAN('0123456789')
+
+*    HEX0 = x'00'
+*    HEX012 = x'000102'
+	HEX0 = SUBSTR(&ALPHABET,1,1)
+	HEX012 = SUBSTR(&ALPHABET,1,3)
+*   I had to convert change -> big money to make SPITBOLx64 happy
+	TB('BT=2($=I/~=S);UT=3(&=A/V=O/v=X);TY=4(.=A/:=B/,=C/;=D);GER=12')
+	TB('LNG=4(.=SHORT/:=LONG/,=SHORT/;=LONG);LABEL=50(X=X)')
+	A = 'CALCULATING1NEXTING2FORGETTING3RESUMING4STASHING5RETRIEVING6IGNOTING7REMEMBERING8ABSTAINING9REINSTATING10WRITING12READINGOUT13'
+
+*    TRACE('ADD', 'F')
+*    TRACE('VS', 'F')
+*    TRACE(.X, 'A')
+*    TRACE(.BT, 'A')
+*    TRACE('FIND', 'F')
+*    TRACE(.WKINP, 'A')
+
+GERL A (BREAK('123456789') . V) (DG . U) = :F(GERK)
+	GER<V> = CV(U) :(GERL)
+
+GERK DATA('LIST(CONT,NEXT)')
+	STMTS = ARRAY(13)
+	TWO31 = 2147483648.D0
+	V = DUPL(' ',165) '-' DUPL(' ',90)
+	ESE = ((NOTANY('"') "'" LEN(1)) | ('"' "'" NOTANY('"'))) *QT()
+	IDP = ((('(' DG ')' (SPAN(' ') | '')) | '') ('PLEASE DO' | 'PLEASE' | 'DO')) . A
+	OPT HEX012 . LST =
+
+*   REWIND requires a channel number, not a file name
+	LST = REWIND(1) DIFFER(LST) ',LIST,PRINT'
+	FILE = '-IN80,FAIL,NOLIST' LST
+	OPT = IDENT(OPT) 'NONE'
+	('OPTIONS SPECIFIED:  ' OPT) LEN(18) $ EJ '' $ OUTPUT REM $ OUTPUT
+	OPT = ',' OPT ','
+	OPT ',NONE,' = ','
+	OPT ',' HEX0 'S' . LIB 'LIBRARY,' '' . RESULT = ','
+	OPT ',OPT,' | ',NOOPT,' = ','
+	OPT ',' (('NO' . KID) | '') 'KIDDING,' = ','
+	WID = '132'
+	OPT ',WIDTH=' (DG . WID) ',' = ','
+	WID = CV(WID)
+	LNS = '60'
+	OPT ',LINES=' (DG . LNS) ',' = ','
+	LNS = CV(LNS)
+	OPT (',SEQ,' . SEQ) | ',NOSEQ,' = ','
+	SRC = 'O2'
+
+	OPT ',' (('NO' . SRC) | (HEX0 'PUN' . SRC) | '') 'SOURCE,' = ','
+	SRC 'NO' = 'RETURN'
+	FMT = 'P2'
+	OPT ',' (('NO' . FMT) | '') 'FORMAT,' = ','
+	FMT 'NO' = 'RETURN'
+	COD = 'NO'
+	OPT ',' (('' . COD) | 'NO') 'CODE,' = ','
+	LST = 'NO'
+	OPT ',' (('' . LST) | 'NO') 'LIST,' = ','
+	SUB = 'OPTSUB'
+	OPT ',' (((('NO' | '') 'OPTSUB') . SUB) | ('NOSUB' '' . SUB)) ',' = ','
+	DEK = 'NO'
+	OPT ',' (('' . DEK) | 'NO') 'DECK,' = ','
+	FILE = IDENT(DEK) '*DECK'
+	FILE = '-' PDS('PRELIM')
+	OPT ',' (('NO' . GHO) | '') 'GO,' = ','
+	OPT ',' (('NO' . BUG) | '') 'BUG,' = ','
+	IAM = 'PROSE'
+	OPT ',' (('PROSE' | 'IAMBIC') . IAM) ',' = ','
+	OPT = NE(SIZE(OPT),1) 'EXTRANEOUS:  ' SUBSTR(OPT,2,SIZE(OPT) - 2)
+	OPT (LEN(11) '' $ OUTPUT $ OUTPUT) $ OUTPUT '' $ OUTPUT REM $ OUTPUT
+	OUT = .EJ
+	'OPTIONS IN EFFECT:' '' $ OUTPUT $ OUTPUT REM $ OUTPUT '' $ OUTPUT
+	(';WIDTH=' WID ';LINES=' LNS ';' IAM ';') ';' BREAK(';') $ OUTPUT FAIL
+	(NO(SUBSTR('NOSOURCE  ',4 - SIZE(SRC) / 2,8)) NO(LST 'LIST'))
+	(NO(SUBSTR('NOFORMAT  ',4 - SIZE(FMT) / 2,8)) NO(COD 'CODE'))
+	(NO(SUBSTR('NOSEQ  ',4 + SIZE(SEQ) / 2,5)) NO(DEK 'DECK'))
+	(NO(SUB SUBSTR('NOSUB',1,5 - 5 * (SIZE(SUB) / 6))) NO(BUG 'BUG'))
+*   Need to figure out what WTP is and reimplement in SPITBOL
+	OUTPUT = NO(KID 'KIDDING') DIFFER(KID) LOAD('WTP(STRING)STRING') RPAD("ICLOWNI   YOU'VE GOT TO BE KIDDING! <",107,'-') ' SNIDE REMARK'
+	(DIFFER(KID) WTP(OUTPUT) UNLOAD('WTP'))
+	(NO('NODICE') NO(GHO 'GO') NO('OPT'))
+	SEQ = LEN(80 - (SIZE(SEQ) / 5) * 8)
+	GHO = DIFFER(DEK) DIFFER(GHO) REWIND('SCRATCH') DETATCH(.FILE) OUTPUT(.GHO,'SCRATCH') '-NOLIST,NOEXECUTE'
+	FILE = DIFFER(GHO) '-NOEXECUTE'
+	GHO = 'END'
+	FILE = DIFFER(SUB) '-' PDS(SUB) PFX('-' PDS(REPLACE(SUB,'SUB','PFX')))
+	FILE = DIFFER(LIB) ENDFILE('SCRATCH') OUTPUT(.FILE,'SUB') './ ADD NAME=NOOPTSUB'
+	ELBL = IDENT(LIB) 'START'
+
+*   MAIN LOOP
+
+*   Read from STDIN, on ^D go to cleanup routines
+IN A = INPUT :F(LAST)
+    FMT 'R' = 'R' O(LPAD(DO + 1,5) '  ' A)
+*Truncate A to 80 characters
+    A SEQ $ A
+    A POS(0) HEX012 HEX0 REM $ A = PFX(A) :S(IN)
+    L = L A
+
+PROC L IDP = HEX0 :F(IN)
+    L (BREAK(HEX0) . STAT) HEX0 =
+    (IDEN STAT) NOTANY(' ') :F(SAVE)
+    (IDEN STAT HEX0 A) 'PLEASE ' HEX0 'DO' :S(PD)
+    PACK(STAT) POS(0) ('REINSTATE' | 'ABSTAINFROM') RPOS(0) :F(OK)
+    A (BREAK(')') ')' (SPAN(' ') | '')) . ERR = :F(OK)
+    STAT = STAT ERR
+
+OK POL(STAT)
+
+SAVE IDEN = A
+    DEN BREAK('PD') . A = LPAD(TRIM(A),7) ' ' :(PROC)
+
+PD IDEN = IDEN ' DO' :(PROC)
+
+
+*   COMPILATION SUBROUTINES
+*       How do we actually get here?
+COMP COMP = ' '
+*   Drop spaces from line of code
+    WKINP = PACK(S)
+    (GE(SIZE(WKINP),150) O(RPAD("ICLOWNI  ARE YOU SURE YOU KNOW WHAT YOU'RE DOING? <",98,'-') ' MESSAGE TO PROGRAMMER'))
+    NNN = LIB CONVERT(DO + 1,'STRING')
+    PTR = 0
+    SKIP('(') :F(NOLBL)
+    LBL = NUM(1) SKIP(')') :F(NGLBL)
+    DIFFER(LABEL<LBL>) :F(OKLBL)
+    ERROR('182','YOU MUST LIKE THIS LABEL A LOT!') :(NOLBL)
+
+NGLBL ERROR('197', "SO! 65535 LABELS AREN'T GOOD ENOUHG FOR YOU?") :(NOLBL)
+OKLBL LABEL<LBL> = NNN ADD('L' LBL)
+NOLBL FLBL = ADD(ELBL " H ='" NNN "' EQ(A" NNN ") :F(E" NNN ")")
+    WKINP ('PLEASEDO' | 'PLEASE' | 'DO') @PTR
+    'X' ('' . LBL) ('X' . U)
+QUAL U = ADD(SKIP('%') ' GT(RND(100),' NUM(0,.VAL) LE(VAL,100) ') :S(E' NNN ')')
+    U PFX(' A' NNN ' = ' IDENT(LBL) SKIP(("NOT" | "N'T") . LBL) '1') 'X' :S(QUAL)
+    WKINP LEN(PTR) =
+    WKINP = REPLACE(WKINP,'&Vv',HEX012)
+
+*   Deconstruct all exclimation marks
+WOW WKINP "!" = "'." :S(WOW)
+
+*   Replace first 3 hex values.
+ULP WKINP (LEN(1) ANY(HEX012)) . U = REPLACE(REVERSE(U),HEX012,'&Vv') :S(ULP)
+    ADD(CLR() ' ' VS('X') SKIP('<-') IEXP() ') :F(DIM)' PUSH(1)) :S(ECOMP)
+    ADD(CLR() ' ' ARR('X') SKIP('<-') " = ARRAY('" EXLIST('BY') FIND(RPOS(0)) "') :F(DIM)" PUSH(1)) :S(ECOMP)
+    (ADD(CLR() SKIP('FORGET#') ' NXTS = NXTS - ' NUM(1) FIND(RPOS(0)) PUSH(3)) ADD(' NXTS = LT(NXTS) 0')) :S(ECOMP)
+    (ADD(CLR() SKIP('FORGET') ' NXTS = NXTS - DCML(' IEXP() ') :F(DIM)' PUSH(3)) ADD(' NXTS = LT(NXTS) 0')) :S(ECOMP)
+    (ADD(CLR() SKIP('RESUME#') ' NXTS = NXTS - ' NUM(1) FIND(RPOS(0)) PUSH(4)) ADD(" TP = 'E' NXTAK<NXTS + 1> :F(RSM)S(STP)")) :S(ECOMP)
+    (ADD(CLR() SKIP('RESUME') ' TP = DCML(' IEXP() ') :F(DIM)' PUSH(4)) ADD(' NXTS = NE(TP) NXTS - TP :F(RS0)') ADD(" TP = 'E' NXTAK<NXTS + 1> :F(RSM)S(STP)")) :S(ECOMP)
+    (CLR() SKIP('STASH')) :F(NOT5)
+
+*   If any of these fail we get a BAD line...
+STSH (' ' VA()) (BREAK("'") LEN(1) BREAK("'") . U REM) . LBL :F(NG)
+    VAL = " = IDENT(IG" REPLACE(U,".:,;","ABCD") ") "
+    (ADD(" TP = " LBL) ADD(" ST<'" U "'>" VAL "ST<'" U "'> + 1"))
+    (ADD(LBL VAL 'TP') DIFFER(REPLACE(SUBSTR(U,1,1),':','.'),'.') ADD(LBL VAL "IDENT(DATATYPE(TP),'ARRAY') COPY(TP)"))
+    FIND('+') :S(STSH)
+    (FIND(RPOS(0)) PUSH(5)) :S(ECOMP)F(NG)
+NOT5 (CLR() SKIP('RETRIEVE')) :F(NOT6)
+RTRV VA() LEN(2) (BREAK(' ') . U) LEN(2) (BREAK("'") . VAL) :F(NG)
+    (ADD(' ' U ' = IDEN(IG' REPLACE(VAL,'.:,;','ABCD') ') ' U ' - 1') ADD(' LT(' U ') :S(STK)') ADD(' ' U ' = EQ(' U ')'))
+    FIND('+') :S(RTRV)
+    (FIND(RPOS(0)) PUSH(6)) :S(ECOMP)F(NG)
+NOT6 (CLR() SKIP('IGNORE')) :F(NOT7)
+IGNR VA('X') BREAK('I') . LBL ('IG' BREAK(")")) . U :F(NG)
+    ADD(DIFFER(SUBSTR(REPLACE(U,'B','A'),3,1),'A') LBL "'X') = ARRAY(PROTOTYPE(" LBL U ")))")
+    (ADD(" " U " = 'X'") FIND('+')) :S(IGNR)
+    (FIND(RPOS(0)) PUSH(7)) :S(ECOMP)F(NG)
+NOT7 (CLR() SKIP('REMEMBER')) :F(NOT8)
+RMBR VA('X') (' IG' BREAK(")")) . U :F(NG)
+    (ADD(U " =") FIND('+')) :S(RMBR)
+    (FIND(RPOS(0)) PUSH(8)) :S(ECOMP)F(NG)
+NOT8 (ADD(CLR() SKIP("ABSTRAINFROM(") "DIFFER(LB<'" NUM(1,.VAL) "'>) :F(ABN)") ADD(" $('A' LB<'" VAL "'>) = 1" PUSH(9))) :S(ECOMP)
+    (ADD(CLR() SKIP("REINSTATE(") " DIFFER(<LB<'" NUM(1,.VAL) "'>) :F(ABN)") ADD(" $('A' LB<'" VAL "'>) =" PUSH(10))) :S(ECOMP)
+    (CLR() FIND('ABSTAINFROM' | 'REINSTATE')) ('' $ LBL) LEN(9) (LEN(1) $ LBL | '') :F(NOT10)
+    LBL 'O' = ',1'
+    WKINP = WKINP '+'
+ARLP U = GER<FIND(BREAK('+'))> SKIP('+') :F(EAR)
+    (DIFFER(U) ADD(' ABRE(' U LBL ')')) :F(NG)S(ARLP)
+EAR PUSH(10 - SIZE(LBL) / 2) :(ECOMP)
+NOT10 ADD(CLR() SKIP('GIVEUP' RPOS(0)) 'E' NNN SUBSTR(DUPL(' ', SIZE(LBL) * 3 + 1) ':(EXIT)',1,8) PUSH(11)) :S(RETURN)
+    (CLR() SKIP('WRITTEN')) :F(NOT12)
+RITE ADD(' ' VS(X) 'IN())') :F(NG)
+    FIND('+') :S(RITE)
+    (FIND(RPOS(0)) PUSH(12)) :S(ECOMP)F(NG)
+NOT12 (CLR() SKIP('READOUT')) :F(NG)
+READ ADD(' OT(' VSM() ')') :F(NG)
+    FIND('+') :S(READ)
+    (FIND(RPOS(0)) PUSH(13)) :S(ECOMP)
+NG S BREAK('DP') =
+APOS S "'" = REPLACE("' " '"' "'" '"' " '","'",HEX0) :S(APOS)
+    COMP = ADD(" ERROR('000','" TRIM(REPLACE(S,HEX0,"'")) "',WAY(H))") '*'
+    BAD = BAD + 1
+ECOMP ELBL = 'E' NNN :(RETURN)
+
+*   SYNTACTICAL ANALYSIS SUBROUTINES (IN ALPHABETICAL ORDER)
+
+ARR PTRX = PTR
+    ARR = "$(ST<'" FIND(ANY(",;") . TYP) NUM(1,.VAL) "'> '" TYP VAL "')" :S(IGARR)
+    PTR = PTRX :(FRETURN)
+IGARR DIFFER(X) :F(RETURN)
+    ARR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
+
+BITS NMBR = N
+    GEBIG(N,'4294967296') :S(FRETURN)
+    TOP = '0'
+    GEBIG(N,'2147483643') :F(TOP0)
+    TOP = '1'
+    NMBR = CV(CONVERT(N '.D0','DREAL') - TWO31)
+TOP0 NMBR = CV(NMBR)
+BTLP BITS = REMDR(NMBR,2) BITS
+    NMBR = NMBR / 2
+    BITS = GE(SIZE(BITS),31) TOP BITS :F(BTLP)S(RETURN)
+
+*   Goes back to start of line to re-scan
+CLR PTR = 0 :(RETURN)
+
+ELEM ELEM = ID() :S(RETURN)
+    PTRX = PTR
+    ELEM = 'F' UT<FIND(ANY('&Vv'))> '(' ID() ')' :S(RETURN)
+    PTR = PTRX :(FRETURN)
+
+EXLIST EXLIST = EXPR() :F(FRETURN)
+EXLOOP EXLIST = EXLIST ',' SKIP(X) EXPR() :F(RETURN)S(EXLOOP)
+
+IEXP IEXP = EXPR() FIND(RPOS(0)) :S(RETURN)
+    ERROR('017','DO YOU EXPECT ME TO FIGURE THIS OUT?') :(FRETURN)
+
+EXPR EXPR = ELEM() :F(FRETURN)
+    PTRX = PTR
+    EXPR = 'F' BT<FIND(ANY('$~'))> '(' EXPR ',' ELEM() ')' :S(RETURN)
+    PTR = PTRX :(RETURN)
+
+*   This is SKIP(X) -> FIND
+*       WKINP is global, current line of INTERCAL being considered
+*       
+FIND WKINP POS(PTR) X . FIND @PTR :S(RETURN)F(FRETURN)
+
+GEBIG LGE(LPAD(I,SIZE(J),'0'),LPAD(J,SIZE(I),'0')) :S(RETURN)F(FRETURN)
+
+ID PTRX = PTR
+    ID = SKIP(ANY('"' '"') . QUOT) EXPR() SKIP(QUOT) :S(RETURN)
+    PTR = PTRX
+    ID = VSM() :S(RETURN)F(FRETURN)
+
+MESH PTRX = PTR
+    MESH = SKIP('#') "'" SUBSTR(BITS(NUM(0)),17,16) "'" :S(RETURN)
+    PTR = PTRX :(FRETURN)
+
+NUM WKINP POS(PTR) (SPAN('0') $ NUM | '') FENCE ((DG $ NUM) | '') @PTRX :F(FRETURN)
+    (DIFFER(NUM) GE(CV(NUM),N) LE(CV(NUM),65535)) :F(FRETURN)
+    PTR = PTRX
+    DIFFER(OPT) :F(RETURN)
+    $OPT = NUM :(RETURN)
+
+SUB PTRX = PTR
+    SUB = "ITEM($(ST<'" FIND(ANY(",;") . TYP) NUM(1,.VAL) SKIP('SUB') "'> '" TYP VAL "')," EXLIST() ")" :S(IGSUB)
+    PTR = PTRX :(FRETURN)
+IGSUB DIFFER(X) :F(RETURN)
+    SUB = SUB ' = ' LNG<TYP> '('
+    SUB ")" = " IG" TY<TYP> VAL ")" :(RETURN)
+
+VA VA = VAR(X) :S(RETURN)
+    VA = ARR(X) :S(RETURN)F(FRETURN)
+
+VAR PTRX = PTR
+    VAR = "$(ST<'" FIND(ANY(".:") . TYP) NUM(1,.VAL) "'> '" TYP VAL "')" :S(IGVAR)
+    PTR = PTRX :(FRETURN)
+IGVAR DIFFER(X) :F(RETURN)
+    VAR = VAR ' = ' LNG<TYP> '('
+    VAR ")" = " IG" TY<TYP> VAL ")" :(RETURN)
+
+VS VS = VAR(X) :S(RETURN)
+    VS = SUB(X) :S(RETURN)F(FRETURN)
+
+VSM VSM = VS() :S(RETURN)
+    VSM = MESH() :S(RETURN)F(FRETURN)
+
+ADD (FLO(X) IDENT(COD) P2(RPAD(X,132),132)) :(RETURN)
+
+CV CV = CONVERT(X,'INTEGER') :F(FRETURN)S(RETURN)
+
+DF X = X ';'
+DFS X BREAK(';') . A ';' = DEFINE(A) :F(RETURN)S(DFS)
+
+ERR (NE(&ERRTYPE,6001) ERROR('788', 'UNEXPLAINED COMPILER BUG {' &ERRTYPE - 632 '.' REVERSE(&LASTNO) '}','1')) :F(ABORT)
+
+ERROR OUTPUT = RPAD('IDL' NUM 'I    ' MSG ' <',114,'-') ' ERROR'
+    FTL = FTL + 1
+    &CODE = 1 IDENT(NXT) :S(RETURN)
+    &CODE = 13 WTP(OUTPUT)
+    OUTPUT = DUPL(' ',10) 'ON THE WAY TO THE STATEMENT ' NXT
+    OUTPUT = DUPL(' ',10) 'CORRECT SOURCE AND RESUBNIT' :(END)
+
+*   This is assuming 80 columns, like a punch card
+FLO X LEN(80) . AT LEN(1) :F(FNL)
+    (' ' AT) QT(1) ESE
+    QTS = QN
+    QTE = QT(1)
+    REVERSE(AT) (NOTANY("'") . QTE *NE(REMDR(QTS - QN,2)) @BRK) | (@BRK ('(' | ',')) | (')' @BRK) | ESE :F(ARGH)
+    QTE LEN(1) = "'"
+    X LEN(80 - BRK) = '+' QTE
+    AT RPOS(BRK) LEN(BRK) = QTE
+    FILE = RPAD(AT,80) :(FLO)
+FNL FILE = RPAD(X,80) :(RETURN)
+
+NO ('      ' X) ('    ' ('N' | ('   ' NOTANY('N'))) REM) $ OUTPUT :(RETURN)
+
+*   Jumps to O2, unless SRC is set to PUN/OPU
+O :($SRC)
+PUN Y = '¬' REPLACE(X,' ','%')
+OPU Y 'v' = 'V@-' :S(OPU)
+    PUNCH = Y
+O2 $OUT = REPLACE(X,'v','V')
+    LN = LN + 1
+    OUT = .OUTPUT
+    LN = EQ(LN,LNS) :F(OPL)
+    OUT = .EJ
+OPL REPLACE(X,&ALPHABET,V) (POS(0) BREAK('-') REM) $ PLUS :(RETURN)
+
+*   Remove all spaces
+PACK PACK ' ' = :S(PACK)F(RETURN)
+
+PDS PDS = 'COPY ' M :(RETURN)
+
+PFX RESULT = X ';' RESULT :(RETURN)
+
+PLUR PLUR = NE(N,1) 'S' :(RETURN)
+
+POL (IDEN PR(IDEN Z)) 'PLEASE' :F(IM)
+    PL = PL + 1
+IM DO = DO + 1 :(RETURN)
+
+PR X = RPAD((COMP(X) LPAD(DO + 1,5) '  ' TRIM(X)),WID) :($FMT)
+
+P2 X LEN(WID) $ P =
+    X O(P) (LEN(1) REM) $ P = RPAD(DUPL(' ',20) P,WID) :S(P2)F(RETURN)
+
+PUSH STMTS<N> = LIST(NNN,STMTS<N>) :(RETURN)
+
+QT QN = DIFFER(X) :S(RETURN)
+    QN = QN + 1 :(FRETURN)
+
+RND (EQ(REMDR(KLOCK(),2)) RD2())
+
+RD2 RX = REMDR(RX * 1027,1048576)
+    RND = 1 + (N * RX) / 1048576 :(RETURN)
+
+*   Makes table variables from a list of options
+TB X = X ';'
+TBS X ('' $ V) (BREAK('=') . L) '=' (BREAK(';(') . A) (('(' (BREAK(')') . V) ')') | '') ';' = :F(RETURN)
+    $L = TABLE(CV(A))
+    V = V '/'
+TBI V (BREAK('=') . A) '=' (BREAK('/') . U) '/' = :F(TBS)
+    ITEM($L,A) = U :(TBI)
+
+*   My own WTP reimplementation
+WTP WTPO = STRING :(RETURN)
+
+*   My own fake KLOK
+KLOCK X = TIME() :(RETURN)
+
+* CLOSEOUT ROUTINES
+
+LAST COD = POL(L) O() O(PL ' / ' DO) O() 'NO'
+    ADD(ELBL " ERROR('633','PROGRAM FELL OFF THE EDGE','THE NEW WORLD')")
+    FILE = DIFFER(LIB) ENDFILE('SUB') OUTPUT(.FILE,'PFX') './ ADD NAME=NOOPTPFX'
+    (LT(PL * 5,DO) ERROR('079','USER IS NOT SUFFICIENTLY POLITE','1'))
+    (GT(PL * 3,DO) ERROR('099','USER IS OVERLY POLITE','1'))
+*   WHAT EXACTLY IS THIS DOING???
+    RESULT GT(RND(10),9) BUG ":" = "$('A' RND(" DO ")) = 'X' :"
+    LABEL = CONVERT(LABEL,'ARRAY')
+    A = 2
+    L = REPLACE(LIB,"S","'")
+
+LBLP A = PFX(" LB<'" LABEL<A,1> "'> = " L LABEL<A,2> L) A + 1 :S(LBLP)
+    L = IDENT(L) "AB<11> = '" PFX(' LB = TABLE(' A + 50 + A / 3 ')')
+    A = 1
+
+ABLP L = PFX(' ' L "'") "AB<" A "> ='"
+    L DIFFER(LIB) "'" = "AB<" A "> '"
+    U = STMTS<A> :F(FROG)
+
+POP A = IDENT(U) A + 1 :S(ABLP)
+    L = L CONT(U) ','
+    U = NEXT(U) :(POP)
+
+FROG (IDENT(LIB) PFX('INIT LNS = ' LNS) IDENT(LST)) :F(WILL)
+    OUT = .EJ
+    LN = 0 DF('NX(N);PP(N);TST(N);CT(N)')
+    U = 0
+    V = 11
+    PLUS = O('         <-     NEXT    FORGET    RESUME    STASH    ' 'IGNORE   ABSTAIN  GIVE UP') '        --     ----    ' '------    ------    -----     -----   ------   ' '-------' :(LIS)
+
+PP PP = LPAD(CT(N),10)
+    STMT<N> = NX(N) :(RETURN)
+TST (IDENT(CT(N)) GE(STMTS<N>,2)) :S(RETURN)F(FRETURN)
+CT CT = IDENT(DATATYPE(STMTS<N>),'LIST') CONT(STMTS<N>) :(RETURN)
+NX NX = IDENT(DATATYPE(STMTS<N>),'LIST') NEXT(STMTS<N>) :S(RETURN)
+    NX = STMTS<N> + 1 :(RETURN)
+
+LIS (O(PP(1) PP(2) PP(3) PP(4) PP(5 + U) PP(7 + U) PP(9 + U) PP(V)) EQ(U) TST(5) TST(7) TST(9) DUPL(' ',42) 'RETRIEVE  ' 'REMEMBER REINSTATE' DUPL(' ',42) '________ ________ ' '_________1') (LEN(70) $ PLUS) (LEN(70) $ PLUS) (LEN(1) $ U)
+    (TST(V) LT(V,13) DUPL(' ',72) 'WRITE IN' DUPL(' ',72) 'READ OUT' DUPL(' ',72) '________' (V + 1)) POS((V / 12) * 80) (LEN(80) $ PLUS) RTAB(82) (LEN(80) $ PLUS) (LEN(2) $ V)
+    (EQ(U,1) EQ(V,13) TST(6) TST(8) TST(10) TST(13) OUTPUT) POS(0) SPAN(' ') RPOS(0) :F(LIS)
+WILL RESULT BREAK(';') . V LEN(1) = FLO(V) :S(WILL)
+    FILE = IDENT(LIB) 'FND'
+    'SUCCESSFUL COMPILATION' REM $ FJ '' $ OUTPUT
+    OUTPUT = 0 + BAD ' UNDECODEABLE STATEMENT' PLUR(BAD)
+    OUTPUT = 0 + FTL ' NON-FATAL ERROR' PLUR(FTL)
+    OUTPUT = '0 FATAL ERRORS'
+    OUTPUT = 2 - (FTL + 2) / (FTL + 1) ' WAS HIGHEST SEVERITY CODE'
+
+END
